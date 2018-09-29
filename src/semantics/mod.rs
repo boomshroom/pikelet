@@ -527,17 +527,18 @@ where
                     .unnest()
                     .into_iter()
                     .map(|(Binder(free_var), Embed((raw_ann, raw_term)))| {
-                        let (term, ann, ann_value) = if let raw::Term::Hole(_) = *raw_ann {
+                        let (term, ann) = if let raw::Term::Hole(_) = *raw_ann {
                             let (term, ann_value) = infer_term(&env, &raw_term)?;
-                            (term, RcTerm::from(&*ann_value.inner), ann_value)
+                            env.insert_declaration(free_var.clone(), ann_value.clone());
+                            (term, RcTerm::from(&*ann_value.inner))
                         } else {
                             let (ann, _) = infer_universe(&env, &raw_ann)?;
                             let ann_value = nf_term(&env, &ann)?;
-                            (check_term(&env, &raw_term, &ann_value)?, ann, ann_value)
+                            env.insert_declaration(free_var.clone(), ann_value.clone());
+                            (check_term(&env, &raw_term, &ann_value)?, ann)
                         };
 
                         env.insert_definition(free_var.clone(), term.clone());
-                        env.insert_declaration(free_var.clone(), ann_value);
 
                         Ok((Binder(free_var), Embed((ann, term))))
                     }).collect::<Result<_, TypeError>>()?;
