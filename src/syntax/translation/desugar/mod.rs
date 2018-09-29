@@ -1,7 +1,7 @@
 use codespan::{ByteIndex, ByteOffset, ByteSpan};
 use codespan_reporting::{Diagnostic, Label as DiagnosticLabel};
 use im::HashMap;
-use moniker::{Binder, Embed, FreeVar, Nest, Scope, Var};
+use moniker::{Binder, Embed, FreeVar, Nest, Scope, Var, Rec};
 
 use syntax::concrete;
 use syntax::raw;
@@ -222,7 +222,7 @@ fn desugar_lam(
 fn desugar_items(
     env: &mut DesugarEnv,
     concrete_items: &[concrete::Item],
-) -> Result<Nest<(Binder<String>, Embed<(raw::RcTerm, raw::RcTerm)>)>, DesugarError> {
+) -> Result<Rec<Nest<(Binder<String>, Embed<(raw::RcTerm, raw::RcTerm)>)>>, DesugarError> {
     use im::HashMap;
 
     #[derive(Clone)]
@@ -319,7 +319,7 @@ fn desugar_items(
         }
     }
 
-    Ok(Nest::new(items))
+    Ok(Rec::new(Nest::new(items)))
 }
 
 fn desugar_let(

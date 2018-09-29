@@ -5,7 +5,7 @@
 //! For more information, check out the theory appendix of the Pikelet book.
 
 use codespan::ByteSpan;
-use moniker::{Binder, BoundPattern, BoundTerm, Embed, FreeVar, Nest, Scope, Var};
+use moniker::{Binder, BoundPattern, BoundTerm, Embed, FreeVar, Nest, Scope, Var, Rec};
 
 use syntax::core::{Literal, Pattern, RcPattern, RcTerm, RcType, RcValue, Term, Value};
 use syntax::raw;
@@ -523,6 +523,7 @@ where
             let (term, ty) = {
                 let mut env = env.clone();
                 let bindings = raw_fields
+                    .unrec()
                     .unnest()
                     .into_iter()
                     .map(|(Binder(free_var), Embed((raw_ann, raw_term)))| {
@@ -542,7 +543,7 @@ where
                     }).collect::<Result<_, TypeError>>()?;
 
                 let (body, ty) = infer_term(&env, &raw_body)?;
-                let term = RcTerm::from(Term::Let(Scope::new(Nest::new(bindings), body)));
+                let term = RcTerm::from(Term::Let(Scope::new(Rec::new(Nest::new(bindings)), body)));
 
                 (term, ty)
             };

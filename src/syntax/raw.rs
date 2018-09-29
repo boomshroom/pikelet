@@ -2,7 +2,7 @@
 //! be elaborated in a type-directed way during type checking and inference
 
 use codespan::ByteSpan;
-use moniker::{Binder, Embed, Nest, Scope, Var};
+use moniker::{Binder, Embed, Nest, Scope, Var, Rec};
 use std::fmt;
 use std::ops;
 use std::rc::Rc;
@@ -137,7 +137,7 @@ pub enum Term {
     /// Let bindings
     Let(
         ByteSpan,
-        Scope<Nest<(Binder<String>, Embed<(RcTerm, RcTerm)>)>, RcTerm>,
+        Scope<Rec<Nest<(Binder<String>, Embed<(RcTerm, RcTerm)>)>>, RcTerm>,
     ),
 }
 

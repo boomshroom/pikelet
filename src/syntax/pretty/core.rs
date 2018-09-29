@@ -155,7 +155,7 @@ impl ToDoc for raw::Term {
             ),
             raw::Term::App(ref head, ref arg) => pretty_app(head.to_doc(), iter::once(&arg.inner)),
             raw::Term::Let(_, ref scope) => pretty_let(
-                Doc::concat(scope.unsafe_pattern.unsafe_patterns.iter().map(
+                Doc::concat(scope.unsafe_pattern.unsafe_pattern.unsafe_patterns.iter().map(
                     |&(ref binder, Embed((ref ann, ref term)))| {
                         parens(
                             pretty_binder(binder)
@@ -259,7 +259,7 @@ impl ToDoc for Term {
                 &scope.unsafe_body.inner,
             ),
             Term::Let(ref scope) => pretty_let(
-                Doc::concat(scope.unsafe_pattern.unsafe_patterns.iter().map(
+                Doc::concat(scope.unsafe_pattern.unsafe_pattern.unsafe_patterns.iter().map(
                     |&(ref binder, Embed((ref ann, ref term)))| {
                         parens(
                             pretty_binder(binder)

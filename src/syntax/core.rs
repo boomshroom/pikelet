@@ -1,6 +1,6 @@
 //! The core syntax of the language
 
-use moniker::{Binder, Embed, FreeVar, Nest, Scope, Var};
+use moniker::{Binder, Embed, FreeVar, Nest, Scope, Var, Rec};
 use std::fmt;
 use std::ops;
 use std::rc::Rc;
@@ -110,7 +110,7 @@ pub enum Term {
     /// Array literals
     Array(Vec<RcTerm>),
     /// Let bindings
-    Let(Scope<Nest<(Binder<String>, Embed<(RcTerm, RcTerm)>)>, RcTerm>),
+    Let(Scope<Rec<Nest<(Binder<String>, Embed<(RcTerm, RcTerm)>)>>, RcTerm>),
 }
 
 impl Term {
@@ -164,6 +164,7 @@ impl RcTerm {
             Term::Let(ref scope) => {
                 let unsafe_patterns = scope
                     .unsafe_pattern
+                    .unsafe_pattern
                     .unsafe_patterns
                     .iter()
                     .map(|&(ref binder, Embed((ref ann, ref term)))| {
@@ -174,7 +175,7 @@ impl RcTerm {
                     }).collect();
 
                 RcTerm::from(Term::Let(Scope {
-                    unsafe_pattern: Nest { unsafe_patterns },
+                    unsafe_pattern: Rec{ unsafe_pattern: Nest { unsafe_patterns } },
                     unsafe_body: scope.unsafe_body.substs(mappings),
                 }))
             },

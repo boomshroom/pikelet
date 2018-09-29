@@ -1,6 +1,6 @@
 use codespan::{ByteIndex, ByteSpan};
 use im::HashMap;
-use moniker::{Binder, BoundTerm, Embed, FreeVar, Nest, Scope, Var};
+use moniker::{Binder, BoundTerm, Embed, FreeVar, Nest, Scope, Var, Rec};
 
 use syntax::concrete;
 use syntax::core;
@@ -358,13 +358,13 @@ fn resugar_lam(
 
 fn resugar_let(
     env: &ResugarEnv,
-    scope: &Scope<Nest<(Binder<String>, Embed<(core::RcTerm, core::RcTerm)>)>, core::RcTerm>,
+    scope: &Scope<Rec<Nest<(Binder<String>, Embed<(core::RcTerm, core::RcTerm)>)>>, core::RcTerm>,
     prec: Prec,
 ) -> concrete::Term {
     let mut env = env.clone();
 
     let (bindings, mut body) = scope.clone().unbind();
-    let bindings = bindings.unnest();
+    let bindings = bindings.unrec().unnest();
 
     let mut items = Vec::with_capacity(bindings.len() * 2);
 
@@ -395,7 +395,7 @@ fn resugar_let(
             _ => break,
         };
 
-        for (binder, Embed((ann, term))) in bindings.unnest() {
+        for (binder, Embed((ann, term))) in bindings.unrec().unnest() {
             let next_name = env.on_binder(&binder);
             // pull lambda arguments from the body into the definition
             let (term_params, term_body) = match resugar_term(&env, &term, Prec::NO_WRAP) {
