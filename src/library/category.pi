@@ -1,0 +1,68 @@
+record {
+	Semigroup;
+
+	Monoid;
+
+	Group;
+
+	Category;
+	id; compose;
+
+	Functor;
+
+	Category-Id;
+	Category-Cat;
+} where {
+	prelude = import "prelude";
+
+	Semigroup = prelude.Semigroup;
+	Monoid = prelude.Monoid;
+	Group = prelude.Group;
+	Category = prelude.Category;
+	-- Functor = prelude.Functor;
+
+	||| The identity arrow
+	id : (C : Category) (a : C.Object) -> C.Arrow a a;
+	id C = C.id;
+
+	||| The sequencing of two arrows
+    seq : (C : Category) (a b c : C.Object) -> C.Arrow a b -> C.Arrow b c -> C.Arrow a c;
+    seq C = C.seq;
+
+    ||| The composition of two arrows
+	compose : (C : Category) (a b c : C.Object) -> C.Arrow b c -> C.Arrow a b -> C.Arrow a c;
+	compose C a b c f g = seq C a b c g f;
+
+	Functor (Source Target : Category) = Record {
+		Map : Source.Object -> Target.Object;
+		map : (a b : Source.Object) -> Source.Arrow a b -> Target.Arrow (Map a) (Map b);
+	};
+
+	asPreludeFunctor : (Source Target : Category) -> Functor Source Target -> prelude.Functor;
+	asPreludeFunctor Source Target f = record {
+		Source;
+		Target;
+		Map = f.Map;
+		map = f.map;
+	};
+
+	Category-Id (t : Type): Category = record {
+        Object = t;
+        Arrow (_ : t) (_ : t) = t;
+        id (x : t) = x;
+        seq (_ _ x _ _ : t) = x;
+    };
+
+    Category-Cat : Category^1 = record {
+        Object = Category;
+        Arrow = Functor;
+        id (c : Category) : Functor c c = record {
+            Map x = x;
+            map (a b : c.Object) (f : c.Arrow a b) = f;
+        };
+        seq (a b c : Category) (f : Functor a b) (g : Functor b c) : Functor a c = record {
+            Map x = g.Map (f.Map x);
+            map (o p : a.Object) (z : a.Arrow o p) = g.map (f.Map o) (f.Map p) (f.map o p z);
+        };
+    };
+}
