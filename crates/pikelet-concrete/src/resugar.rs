@@ -212,7 +212,7 @@ fn resugar_fun_ty(
         )];
 
         // Argument resugaring
-        #[cfg_attr(feature = "cargo-clippy", allow(while_let_loop))] // Need NLL in stable!
+        #[allow(clippy::while_let_loop)] // Need NLL in stable!
         loop {
             // Share a parameter list if another pi is nested directly inside.
             // For example:
@@ -308,7 +308,7 @@ fn resugar_fun_intro(
     )];
 
     // Argument resugaring
-    #[cfg_attr(feature = "cargo-clippy", allow(while_let_loop))]
+    #[allow(clippy::while_let_loop)]
     loop {
         // Share a parameter list if another lambda is nested directly inside.
         // For example:
@@ -405,7 +405,7 @@ fn resugar_let(
         }
     }
 
-    #[cfg_attr(feature = "cargo-clippy", allow(while_let_loop))]
+    #[allow(clippy::while_let_loop)]
     loop {
         let (bindings, next_body) = match *body {
             core::Term::Let(ref scope) => scope.clone().unbind(),
